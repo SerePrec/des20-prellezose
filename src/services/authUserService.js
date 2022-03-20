@@ -1,4 +1,4 @@
-import { userModel } from "../model/index.js";
+import { userDAO as userModel } from "../model/index.js";
 import { createHash, isValidPassword } from "../utils/crypt.js";
 import { logger } from "../logger/index.js";
 

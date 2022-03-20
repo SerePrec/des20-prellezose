@@ -1,24 +1,16 @@
-import mongoose from "mongoose";
-import ContenedorMongoDB from "../../containers/ContenedorMongoDB.js";
+import BaseDAOMongoDB from "../../BaseDAOs/BaseDAOMongoDB.js";
+import { messageSchema } from "../../schemas/mongoDBSchemas.js";
+import { MessageDTO } from "../../DTOs/MessageDTO.js";
 
-const { Schema } = mongoose;
+class MessagesDAOMongoDB extends BaseDAOMongoDB {
+  static #instance;
 
-const messageSchema = new Schema({
-  author: {
-    email: { type: String, required: true },
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
-    age: { type: Number, required: true },
-    alias: { type: String, required: true },
-    avatar: { type: String, required: true }
-  },
-  text: { type: String, required: true },
-  timestamp: { type: Date, default: Date.now }
-});
-
-class MessagesDAOMongoDB extends ContenedorMongoDB {
   constructor() {
-    super("Message", messageSchema);
+    if (MessagesDAOMongoDB.#instance) {
+      return MessagesDAOMongoDB.#instance;
+    }
+    super("Message", messageSchema, MessageDTO);
+    MessagesDAOMongoDB.#instance = this;
   }
 }
 

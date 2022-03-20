@@ -1,25 +1,25 @@
-import mongoose from "mongoose";
-import ContenedorMongoDB from "../../containers/ContenedorMongoDB.js";
-import { deepClone, renameField } from "../../../utils/dataTools.js";
+import BaseDAOMongoDB from "../../BaseDAOs/BaseDAOMongoDB.js";
+import { userSchema } from "../../schemas/mongoDBSchemas.js";
+import { UserDTO } from "../../DTOs/UserDTO.js";
 
-const { Schema } = mongoose;
+class UsersDAOMongoDB extends BaseDAOMongoDB {
+  static #instance;
 
-const userSchema = new Schema({
-  username: { type: String, required: true, unique: true },
-  password: { type: String, required: true }
-});
-
-class UsersDAOMongoDB extends ContenedorMongoDB {
   constructor() {
-    super("User", userSchema);
+    if (UsersDAOMongoDB.#instance) {
+      return UsersDAOMongoDB.#instance;
+    }
+    super("User", userSchema, UserDTO);
+    UsersDAOMongoDB.#instance = this;
   }
+
   async getByUsername(username) {
     try {
       let element = await this.CollModel.findOne({ username }, { __v: 0 });
-      return element ? renameField(deepClone(element), "_id", "id") : null;
+      return element ? new this.DTO(element) : null;
     } catch (error) {
       throw new Error(
-        `Error al obtener el elemento con username: '${username}': ${error}`
+        `Error al obtener el usuario con username: '${username}': ${error}`
       );
     }
   }

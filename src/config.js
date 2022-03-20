@@ -22,28 +22,12 @@ const config = {
   PORT: process.env.PORT || Number(argv.PORT) || 8080,
   MODE: process.env.MODE || argv.MODE || "FORK",
   numCPUs: os.cpus().length,
-  logsFolder: path.join(__dirname, "logs"),
+  PERS: process.env.PERS?.toLowerCase() || "mem",
   fileSystemDb: {
     path: path.join(__dirname, "..", "DB"),
     messagesFile: "mensajes.json",
-    productsFile: "productos.json"
-  },
-  mariaDb: {
-    client: "mysql",
-    connection: {
-      host: "127.0.0.1",
-      user: process.env.MARIADB_USER || "root",
-      password: process.env.MARIADB_PWD || "",
-      database: process.env.MARIADB_DB || "test",
-      charset: "utf8mb4"
-    }
-  },
-  sqlite3: {
-    client: "sqlite3",
-    connection: {
-      filename: path.join(__dirname, "..", "DB", "ecommerce.sqlite")
-    },
-    useNullAsDefault: true
+    productsFile: "productos.json",
+    usersFile: "usuarios.json"
   },
   mongoDb: {
     connectionString: process.env.MONGODB_URI || "mongodb://localhost/test",
@@ -84,7 +68,8 @@ const config = {
         maxAge: 10 * 60 * 1000
       }
     }
-  }
+  },
+  logsFolder: path.join(__dirname, "logs")
 };
 
 export default config;

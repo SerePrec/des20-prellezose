@@ -1,4 +1,4 @@
-import { productsModel } from "../model/index.js";
+import { productsDAO as productsModel } from "../model/index.js";
 
 export const getAllProducts = async () => {
   const lista = await productsModel.getAll();

@@ -1,12 +1,47 @@
-import MessagesDAOMongoDB from "./DAOs/messages/MessagesDAOMongoDB.js";
-import ProductsDAOMongoDB from "./DAOs/products/ProductsDAOMongoDB.js";
-import UsersDAOMongoDB from "./DAOs/users/UsersDAOMongoDB.js";
+import MessagesFactoryDAO from "./DAOs/messages/MessagesFactoryDAO.js";
+import ProductsFactoryDAO from "./DAOs/products/ProductsFactoryDAO.js";
+import UsersFactoryDAO from "./DAOs/users/UsersFactoryDAO.js";
+import config from "../config.js";
+import { logger } from "../logger/index.js";
 
-// ELECCIÓN DE PERSISTENCIA: MONGODB ****************
-// **************************************************
+const productsDAO = await ProductsFactoryDAO.get();
+const messagesDAO = await MessagesFactoryDAO.get();
+const userDAO = await UsersFactoryDAO.get();
 
-const productsModel = new ProductsDAOMongoDB();
-const messagesModel = new MessagesDAOMongoDB();
-const userModel = new UsersDAOMongoDB();
+//Inicializo los DAOS
+try {
+  await productsDAO.init();
+  await messagesDAO.init();
+  await userDAO.init();
+  logger.info(`Persistencia [${config.PERS}] inicializada`);
+} catch (error) {
+  logger.error(error);
+  process.exit(1);
+}
 
-export { productsModel, messagesModel, userModel };
+export { productsDAO, messagesDAO, userDAO };
+
+// FIXME: Info provisoria
+// **************  PRUEBA  ****************
+// ****************************************
+// instancio otra vez para verificar
+// que devuelven la misma instancia
+const productsDAO2 = await ProductsFactoryDAO.get();
+const messagesDAO2 = await MessagesFactoryDAO.get();
+const userDAO2 = await UsersFactoryDAO.get();
+
+console.log("\n******************* TEST SINGLETON *******************");
+console.log(
+  "ProductsDAO-Instancia1 = ProductsDAO-instancia2: ",
+  productsDAO === productsDAO2
+);
+console.log(
+  "MessagesDAO-Instancia1 = MessagesDAO-instancia2: ",
+  messagesDAO === messagesDAO2
+);
+console.log(
+  "UsersDAO-Instancia1 = UsersDAO-instancia2: ",
+  userDAO === userDAO2
+);
+console.log("******************************************************\n");
+// **************  PRUEBA  ****************

@@ -1,32 +1,36 @@
 import { logger } from "../../logger/index.js";
 
-class ContenedorMem {
-  constructor() {
+class BaseDAOMem {
+  constructor(DTO) {
     this.elements = [];
     this.nextId = 1;
+    this.DTO = DTO;
   }
+
+  //No tiene funcionalidad pero es para mantener las mismas interfaces
+  init() {}
 
   //Obtengo todos los elementos
   getAll() {
-    return [...this.elements];
+    return this.elements.map(element => new this.DTO(element));
   }
 
   //Obtengo un elemento por su id
   getById(id) {
     id = parseInt(id);
     const match = this.elements.find(elem => elem.id === id);
-    return match ? match : null;
+    return match ? new this.DTO(match) : null;
   }
 
   //Guardo el elemento
   save(data) {
     const id = this.nextId;
     const timestamp = new Date().toISOString();
-    const elemento = { id, timestamp, ...data };
-    this.elements.push(elemento);
+    const element = { id, timestamp, ...data };
+    this.elements.push(element);
     this.nextId++;
     logger.debug("Elemento guardado con éxito");
-    return elemento;
+    return new this.DTO(element);
   }
 
   //actualizo un elemento por su id
@@ -43,7 +47,7 @@ class ContenedorMem {
       );
       this.elements = newContent;
       logger.debug(`El elemento con id: ${id} se actualizó con éxito`);
-      return newElement;
+      return new this.DTO(newElement);
     } else {
       logger.debug(`No se encontró el elemento con el id: ${id}`);
       return null;
@@ -71,4 +75,4 @@ class ContenedorMem {
   }
 }
 
-export default ContenedorMem;
+export default BaseDAOMem;

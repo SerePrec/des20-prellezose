@@ -1,4 +1,7 @@
-import { productsModel, messagesModel } from "./model/index.js";
+import {
+  productsDAO as productsModel,
+  messagesDAO as messagesModel
+} from "./model/index.js";
 import { escapeHtml, normalizeMessages } from "./utils/messageTools.js";
 import { logger } from "./logger/index.js";
 
