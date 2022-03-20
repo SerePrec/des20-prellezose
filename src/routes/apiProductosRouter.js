@@ -1,8 +1,8 @@
 import { Router } from "express";
 import {
   validateId,
-  validatePostBody,
-  validatePutBody
+  validatePostProductBody,
+  validatePutProductBody
 } from "../middlewares/validateApiData.js";
 import * as controller from "../controllers/apiProductosController.js";
 
@@ -10,11 +10,16 @@ const router = Router();
 
 router.get("/", controller.getAllProducts);
 
-router.post("/", validatePostBody, controller.createProduct);
+router.post("/", validatePostProductBody, controller.createProduct);
 
 router.get("/:id", validateId, controller.getProduct);
 
-router.put("/:id", validateId, validatePutBody, controller.updateProduct);
+router.put(
+  "/:id",
+  validateId,
+  validatePutProductBody,
+  controller.updateProduct
+);
 
 router.delete("/:id", validateId, controller.deleteProduct);
 

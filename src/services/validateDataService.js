@@ -6,7 +6,7 @@ const validateId = id => {
 };
 
 //Valida que el formato de datos a guardar sea válido
-const validatePostBody = (title, price, thumbnail) => {
+const validatePostProductBody = (title, price, thumbnail) => {
   if (
     !(typeof title == "string" && /\w+/.test(title)) ||
     !(
@@ -28,7 +28,7 @@ const validatePostBody = (title, price, thumbnail) => {
 };
 
 //Valida que el formato de datos a actualizar sea válido
-const validatePutBody = (title, price, thumbnail) => {
+const validatePutProductBody = (title, price, thumbnail) => {
   if (
     (title !== undefined && !(typeof title == "string" && /\w+/.test(title))) ||
     (price !== undefined &&
@@ -67,4 +67,9 @@ const validateRegisterPost = (username, password) => {
   else return true;
 };
 
-export { validateId, validatePostBody, validatePutBody, validateRegisterPost };
+export {
+  validateId,
+  validatePostProductBody,
+  validatePutProductBody,
+  validateRegisterPost
+};

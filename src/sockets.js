@@ -1,8 +1,6 @@
-import {
-  productsDAO as productsModel,
-  messagesDAO as messagesModel
-} from "./model/index.js";
-import { escapeHtml, normalizeMessages } from "./utils/messageTools.js";
+import * as productsService from "./services/productosService.js";
+import * as messagesService from "./services/messagesService.js";
+import * as validateDataService from "./services/validateDataService.js";
 import { logger } from "./logger/index.js";
 
 //Configuración de sockets
@@ -16,7 +14,7 @@ export default io => {
 
     //Obtiene listado de productos con cada conexión entrante y lo envía al socket
     try {
-      const list = await productsModel.getAll();
+      const list = await productsService.getAllProducts();
       socket.emit("allProducts", list);
     } catch (error) {
       logger.error(error);
@@ -28,8 +26,7 @@ export default io => {
 
     //Obtiene listado de mensajes con cada conexión entrante y lo envía al socket
     try {
-      const messages = await messagesModel.getAll();
-      const normalizedMessages = normalizeMessages(messages);
+      const normalizedMessages = await messagesService.getAllMessages();
       socket.emit("allMessages", normalizedMessages);
     } catch (error) {
       logger.error(error);
@@ -39,11 +36,18 @@ export default io => {
     //Escucha el evento de guardar un nuevo producto
     socket.on("saveProduct", async product => {
       try {
-        const newProduct = validateProductData(product);
-        if (newProduct) {
-          await productsModel.save(newProduct);
-          const list = await productsModel.getAll();
+        const { title, price, thumbnail } = product;
+        const newProduct = validateDataService.validatePostProductBody(
+          title,
+          price,
+          thumbnail
+        );
+        if (newProduct && !newProduct.error) {
+          await productsService.createProduct(newProduct);
+          const list = await productsService.getAllProducts();
           io.sockets.emit("allProducts", list);
+        } else {
+          socket.emit("productErrors", "Los valores enviados no son válidos");
         }
       } catch (error) {
         logger.error(error);
@@ -54,14 +58,8 @@ export default io => {
     //Escucha el evento de un nuevo mensaje enviado
     socket.on("newMessage", async message => {
       try {
-        if (!message.author || !message.text.trim())
-          throw new Error("Mensaje inválido");
-
-        message.text = escapeHtml(message.text);
-        const newMessage = { ...message };
-        await messagesModel.save(newMessage);
-        const messages = await messagesModel.getAll();
-        const normalizedMessages = normalizeMessages(messages);
+        await messagesService.createMessage(message);
+        const normalizedMessages = await messagesService.getAllMessages();
         io.sockets.emit("allMessages", normalizedMessages);
       } catch (error) {
         logger.error(error);
@@ -77,30 +75,6 @@ export default io => {
       );
       //io.sockets.emit("usersCount", io.engine.clientsCount);
     });
-
-    //Valida los datos del producto que se va a cargar
-    function validateProductData(data) {
-      let { title, price, thumbnail } = data;
-      if (
-        !(typeof title == "string" && /\w+/.test(title)) ||
-        !(
-          (typeof price == "string" || typeof price == "number") &&
-          /^\d+(\.\d+)?$/.test(price)
-        ) ||
-        !(
-          typeof thumbnail == "string" &&
-          /^(ftp|http|https):\/\/[^ "]+$/.test(thumbnail)
-        )
-      ) {
-        socket.emit("productErrors", "Los valores enviados no son válidos");
-        return false;
-      } else {
-        title = title.trim();
-        price = Math.round(parseFloat(price) * 100) / 100;
-        thumbnail = thumbnail.trim();
-        return { title, price, thumbnail };
-      }
-    }
   });
 
   //Cambié a esta forma de actualizar los usuarios conectados para ser compatible con el modo cluster. Así cada x seg cada servidro worker envía los usuarios que tiene conectados y en el front se procesa el conjunto de infomación

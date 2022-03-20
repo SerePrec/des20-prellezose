@@ -9,9 +9,9 @@ const validateId = (req, res, next) => {
   }
 };
 
-const validatePostBody = (req, res, next) => {
+const validatePostProductBody = (req, res, next) => {
   let { title, price, thumbnail } = req.body;
-  const validated = validateDataService.validatePostBody(
+  const validated = validateDataService.validatePostProductBody(
     title,
     price,
     thumbnail
@@ -24,9 +24,9 @@ const validatePostBody = (req, res, next) => {
   }
 };
 
-const validatePutBody = (req, res, next) => {
+const validatePutProductBody = (req, res, next) => {
   let { title, price, thumbnail } = req.body;
-  const validated = validateDataService.validatePutBody(
+  const validated = validateDataService.validatePutProductBody(
     title,
     price,
     thumbnail
@@ -39,4 +39,4 @@ const validatePutBody = (req, res, next) => {
   }
 };
 
-export { validateId, validatePostBody, validatePutBody };
+export { validateId, validatePostProductBody, validatePutProductBody };
