@@ -1,9 +1,9 @@
 class UserDTO {
   constructor(data) {
-    this.id = data.id || data._id;
     this.username = data.username;
     this.password = data.password;
-    this.timestamp = data.timestamp;
+    data.id || data._id ? (this.id = data.id || data._id) : null;
+    data.timestamp ? (this.timestamp = data.timestamp) : null;
   }
 }
 
