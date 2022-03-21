@@ -1,17 +1,22 @@
-import { messagesDAO as messagesModel } from "../model/index.js";
+import MessagesRepository from "../repositories/MessagesRepository.js";
+import { Message } from "../model/entities/Message.js";
+import { MessageDTO } from "../model/DTOs/MessageDTO.js";
 import { escapeHtml, normalizeMessages } from "../utils/messageTools.js";
 
+const messagesModel = new MessagesRepository();
+
 export const getAllMessages = async () => {
-  const messages = await messagesModel.getAll();
+  const messageEntities = await messagesModel.getAll();
+  const messages = messageEntities.map(message => new MessageDTO(message));
   const normalizedMessages = normalizeMessages(messages);
   return normalizedMessages;
 };
 
 export const createMessage = async message => {
-  if (!message.author || !message.text.trim())
-    throw new Error("Mensaje inválido");
+  const validMessage = Message.validate(message, true);
+  if (!validMessage) throw new Error("Mensaje inválido");
   message.text = escapeHtml(message.text);
-  const newMessage = { ...message };
-  const createdMessage = await messagesModel.save(newMessage);
-  return createdMessage;
+  const newMessageEntitie = new Message(message);
+  const createdMessageEntitie = await messagesModel.save(newMessageEntitie);
+  return new MessageDTO(createdMessageEntitie);
 };

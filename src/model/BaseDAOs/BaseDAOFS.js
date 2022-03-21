@@ -67,7 +67,7 @@ class BaseDAOFS {
     try {
       const id = this.nextId;
       const timestamp = new Date().toISOString();
-      const element = { id, timestamp, ...data };
+      const element = { ...data, id, timestamp };
       const content = await this.getAll();
       content.push(element);
       await fs.writeFile(this.path, JSON.stringify(content, null, 2));

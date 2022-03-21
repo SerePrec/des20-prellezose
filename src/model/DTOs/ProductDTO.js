@@ -4,6 +4,7 @@ class ProductDTO {
     this.title = data.title;
     this.price = data.price;
     this.thumbnail = data.thumbnail;
+    this.timestamp = data.timestamp;
   }
 }
 

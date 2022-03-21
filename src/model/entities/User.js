@@ -1,8 +1,11 @@
 import Joi from "joi";
+import { logger } from "../../logger/index.js";
 
 export class User {
   _username;
   _password;
+  static usernamePattern =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
   constructor({ username, password }) {
     this.username = username;
@@ -11,12 +14,14 @@ export class User {
 
   static validate(user, requerido) {
     const UserSchema = Joi.object({
-      username: requerido ? Joi.string().required() : Joi.string(),
-      password: requerido ? Joi.string().required() : Joi.string()
+      username: requerido
+        ? Joi.string().pattern(User.usernamePattern).trim().required()
+        : Joi.string().pattern(User.usernamePattern).trim(),
+      password: requerido ? Joi.string().min(6).required() : Joi.string().min(6)
     });
     const { error, value } = UserSchema.validate(user);
     if (error) {
-      console.log(`Error de validación: ${error.message}`);
+      logger.error(`Error de validación: ${error.message}`);
       return false;
     }
     return value;
@@ -27,11 +32,15 @@ export class User {
   }
 
   set username(username) {
-    const { error } = Joi.string().required().validate(username);
+    const { error, value } = Joi.string()
+      .pattern(User.usernamePattern)
+      .trim()
+      .required()
+      .validate(username);
     if (error) {
       throw new Error(`username: ${error.message}`);
     }
-    this._username = username;
+    this._username = value;
   }
 
   get password() {
@@ -39,11 +48,11 @@ export class User {
   }
 
   set password(password) {
-    const { error } = Joi.string().required().validate(password);
+    const { error, value } = Joi.string().min(6).required().validate(password);
     if (error) {
       throw new Error(`password: ${error.message}`);
     }
-    this._password = password;
+    this._password = value;
   }
 }
 
@@ -61,11 +70,11 @@ export class UserWithId extends User {
   }
 
   set id(id) {
-    const { error } = Joi.required().validate(id);
+    const { error, value } = Joi.required().validate(id);
     if (error) {
       throw new Error(`id: ${error.message}`);
     }
-    this._id = id;
+    this._id = value;
   }
 
   get timestamp() {
@@ -73,10 +82,10 @@ export class UserWithId extends User {
   }
 
   set timestamp(timestamp) {
-    const { error } = Joi.date().iso().required().validate(timestamp);
+    const { error, value } = Joi.date().iso().required().validate(timestamp);
     if (error) {
-      throw new Error(`id: ${error.message}`);
+      throw new Error(`timestamp: ${error.message}`);
     }
-    this._timestamp = timestamp;
+    this._timestamp = value;
   }
 }

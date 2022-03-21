@@ -19,9 +19,9 @@ export default class BaseRepository {
 
   //Guardo el elemento
   async save(entity) {
-    const dto = new this.DTO(entity);
-    const newEntity = await this.dao.save(dto);
-    return new this.Entity(newEntity);
+    let dto = new this.DTO(entity);
+    dto = await this.dao.save(dto);
+    return new this.Entity(dto);
   }
 
   //actualizo un elemento por su id

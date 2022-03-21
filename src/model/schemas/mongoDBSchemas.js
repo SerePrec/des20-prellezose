@@ -17,12 +17,14 @@ const messageSchema = new Schema({
 const productSchema = new Schema({
   title: { type: String, required: true },
   price: { type: Number, required: true, min: 0 },
-  thumbnail: { type: String, required: true }
+  thumbnail: { type: String, required: true },
+  timestamp: { type: Date, default: Date.now }
 });
 
 const userSchema = new Schema({
   username: { type: String, required: true, unique: true },
-  password: { type: String, required: true }
+  password: { type: String, required: true },
+  timestamp: { type: Date, default: Date.now }
 });
 
 export { messageSchema, productSchema, userSchema };

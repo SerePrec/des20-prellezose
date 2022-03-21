@@ -1,23 +1,31 @@
-import { productsDAO as productsModel } from "../model/index.js";
+import ProductsRepository from "../repositories/ProductsRepository.js";
+import { Product } from "../model/entities/Product.js";
+import { ProductDTO } from "../model/DTOs/ProductDTO.js";
+
+const productsModel = new ProductsRepository();
 
 export const getAllProducts = async () => {
-  const lista = await productsModel.getAll();
-  return lista;
+  const productEntities = await productsModel.getAll();
+  const products = productEntities.map(product => new ProductDTO(product));
+  return products;
 };
 
 export const createProduct = async newProduct => {
-  const createdProduct = await productsModel.save(newProduct);
-  return createdProduct;
+  const newProductEntitie = new Product(newProduct);
+  const createdProductEntitie = await productsModel.save(newProductEntitie);
+  return new ProductDTO(createdProductEntitie);
 };
 
 export const getProduct = async id => {
-  const product = await productsModel.getById(id);
-  return product;
+  const productEntitie = await productsModel.getById(id);
+  return productEntitie ? new ProductDTO(productEntitie) : productEntitie;
 };
 
-export const updateProduct = async (id, updateProduct) => {
-  const updatedProduct = await productsModel.updateById(id, updateProduct);
-  return updatedProduct;
+export const updateProduct = async (id, updateData) => {
+  const updatedProductEntitie = await productsModel.updateById(id, updateData);
+  return updatedProductEntitie
+    ? new ProductDTO(updatedProductEntitie)
+    : updatedProductEntitie;
 };
 
 export const deleteProduct = async id => {

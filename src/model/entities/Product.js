@@ -1,9 +1,12 @@
 import Joi from "joi";
+import { logger } from "../../logger/index.js";
 
 export class Product {
   _title;
   _price;
   _thumbnail;
+
+  static thumbnailPattern = /^(ftp|http|https):\/\/[^ "]+$/;
 
   constructor({ title, price, thumbnail }) {
     this.title = title;
@@ -13,15 +16,17 @@ export class Product {
 
   static validate(product, requerido) {
     const ProductSchema = Joi.object({
-      title: requerido ? Joi.string().required() : Joi.string(),
+      title: requerido ? Joi.string().trim().required() : Joi.string().trim(),
       price: requerido
-        ? Joi.number().positive().required()
-        : Joi.number().positive(),
-      thumbnail: requerido ? Joi.string().required() : Joi.string()
+        ? Joi.number().positive().precision(2).required()
+        : Joi.number().positive().precision(2),
+      thumbnail: requerido
+        ? Joi.string().pattern(Product.thumbnailPattern).trim().required()
+        : Joi.string().pattern(Product.thumbnailPattern).trim()
     });
     const { error, value } = ProductSchema.validate(product);
     if (error) {
-      console.log(`Error de validación: ${error.message}`);
+      logger.error(`Error de validación: ${error.message}`);
       return false;
     }
     return value;
@@ -32,11 +37,11 @@ export class Product {
   }
 
   set title(title) {
-    const { error } = Joi.string().required().validate(title);
+    const { error, value } = Joi.string().trim().required().validate(title);
     if (error) {
       throw new Error(`title: ${error.message}`);
     }
-    this._title = title;
+    this._title = value;
   }
 
   get price() {
@@ -44,11 +49,15 @@ export class Product {
   }
 
   set price(price) {
-    const { error } = Joi.number().positive().required().validate(price);
+    const { error, value } = Joi.number()
+      .positive()
+      .precision(2)
+      .required()
+      .validate(price);
     if (error) {
       throw new Error(`price: ${error.message}`);
     }
-    this._price = price;
+    this._price = value;
   }
 
   get thumbnail() {
@@ -56,19 +65,25 @@ export class Product {
   }
 
   set thumbnail(thumbnail) {
-    const { error } = Joi.string().required().validate(thumbnail);
+    const { error, value } = Joi.string()
+      .pattern(Product.thumbnailPattern)
+      .trim()
+      .required()
+      .validate(thumbnail);
     if (error) {
       throw new Error(`thumbnail: ${error.message}`);
     }
-    this._thumbnail = thumbnail;
+    this._thumbnail = value;
   }
 }
 
 export class ProductWithId extends Product {
   _id;
-  constructor({ id, title, price, thumbnail }) {
+  _timestamp;
+  constructor({ id, title, price, thumbnail, timestamp }) {
     super({ title, price, thumbnail });
     this.id = id;
+    this.timestamp = timestamp;
   }
 
   get id() {
@@ -76,10 +91,22 @@ export class ProductWithId extends Product {
   }
 
   set id(id) {
-    const { error } = Joi.required().validate(id);
+    const { error, value } = Joi.required().validate(id);
     if (error) {
       throw new Error(`id: ${error.message}`);
     }
-    this._id = id;
+    this._id = value;
+  }
+
+  get timestamp() {
+    return this._timestamp;
+  }
+
+  set timestamp(timestamp) {
+    const { error, value } = Joi.date().iso().required().validate(timestamp);
+    if (error) {
+      throw new Error(`timestamp: ${error.message}`);
+    }
+    this._timestamp = value;
   }
 }

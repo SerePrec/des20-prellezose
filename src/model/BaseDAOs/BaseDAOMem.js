@@ -26,7 +26,7 @@ class BaseDAOMem {
   save(data) {
     const id = this.nextId;
     const timestamp = new Date().toISOString();
-    const element = { id, timestamp, ...data };
+    const element = { ...data, id, timestamp };
     this.elements.push(element);
     this.nextId++;
     logger.debug("Elemento guardado con éxito");
