@@ -35,7 +35,21 @@ Se puede pasar por parámetros de argumento dos opciones:
 | `-p --port --PORT` | Número de puerto de escucha del servidor | 8080 |
 | `-m --mode --MODE` | Módo de ejecución del servidor. `FORK` o `CLUSTER` | FORK |
 
-Se puede seleccionar entre dos métodos de persistencia de **datos y sesiones** a través de la variable de entorno `PERS`. El modo `PERS=mongodb_atlas` **(DEFECTO)** para persistir en **MongoDB Atlas** y el modo `PERS=mongodb` para hacer lo mismo en **MongoDB local**
+Se puede seleccionar entre cuatro métodos de **persistencia de datos** a través de la variable de entorno `PERS`.
+
+| Key             | Descripción                                               |
+| --------------- | --------------------------------------------------------- |
+| `mem`           | Persistencia en memoria del servidor (Opción por defecto) |
+| `file`          | Persistencia usando el sistema de archivos                |
+| `mongodb`       | Persistencia en base de datos MongoDB local               |
+| `mongodb_atlas` | Persistencia en base de datos MongoDB Atlas               |
+
+Esta selección se hace pasando el valor correspondiente de la key en la variable de entorno `PERS` a la hora de levantar el servidor.
+La forma de hacerlo depende de la terminal que se esté ejecutando. Un ejemplo desde linux sería:
+
+```sh
+$ PERS=mongodb_atlas node .
+```
 
 ### Vistas
 
@@ -62,16 +76,41 @@ Estas vistas se encuentran en las rutas:
 
 Consiste en las siguientes rutas:
 
-#### Router /api/productos
+##### Router /api/productos
 
-| Método | Endpoint                | Descripción                                                                                                                                                                                                                 |
-| ------ | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GET    | **/api/productos/**     | Me permite listar todos los productos disponibles                                                                                                                                                                           |
-| POST   | **/api/productos/**     | Para incorporar productos al listado                                                                                                                                                                                        |
-| GET    | **/api/productos/:id**  | Me permite listar un producto por su id                                                                                                                                                                                     |
-| PUT    | **/api/productos/:id**  | Actualiza un producto por su id. Admite actualizaciones parciales                                                                                                                                                           |
-| DELETE | **/api/productos/:id**  | Borra un producto por su id                                                                                                                                                                                                 |
-| GET    | **/api/productos-test** | Devuelve un listado de 5 productos mock generados con **Faker.js**                                                                                                                                                          |
-| GET    | **/api/randoms**        | Devuelve una cantidad de números aleatorios en el rango del 1 al 1000 especificada por parámetros de consulta (query). Por ej: `/api/randoms?cant=20000`. Si dicho parámetro no se ingresa, calcula 100.000.000 de números. |
+| Método | Endpoint                | Descripción                                                        |
+| ------ | ----------------------- | ------------------------------------------------------------------ |
+| GET    | **/api/productos/**     | Me permite listar todos los productos disponibles                  |
+| POST   | **/api/productos/**     | Para incorporar productos al listado                               |
+| GET    | **/api/productos/:id**  | Me permite listar un producto por su id                            |
+| PUT    | **/api/productos/:id**  | Actualiza un producto por su id. Admite actualizaciones parciales  |
+| DELETE | **/api/productos/:id**  | Borra un producto por su id                                        |
+| GET    | **/api/productos-test** | Devuelve un listado de 5 productos mock generados con **Faker.js** |
+
+#### Router /api/randoms
+
+| Método | Endpoint         | Descripción                                                                                                                                                                                                                 |
+| ------ | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | **/api/randoms** | Devuelve una cantidad de números aleatorios en el rango del 1 al 1000 especificada por parámetros de consulta (query). Por ej: `/api/randoms?cant=20000`. Si dicho parámetro no se ingresa, calcula 100.000.000 de números. |
 
 ### Detalles y comentarios
+
+Tomando como base la estructura de carpetas del último desafío en donde ya había hecho una división de componentes: **rutas**, **controladores**,**middlewares**, **servicios** y **modelos**, comencé reorganizando la carpeta `model`.
+Dentro de esta carpeta y agrupado en subcarpetas, se encuentran:
+
+- `BaseDAOs`: DAOs para las distintas persistencias, a partir de los cuales se extienden los DAOs particulares
+- `DAOs`: aquí se encuentran los DAOs de las distintas persistencias agrupados por entidades junto a la **Factory** correspondiente.
+- `DTOs`: se ubican los DTOs separados por entidades
+- `entities`: clases que definen las entidades y sus validaciones
+- `schemas`: schemas de **mongoose**
+- `index.js`: archivo de índice que exporta los DAOs. Desde este archivo se importan las distintas **Factories** y se les pide el DAO correspondiente para luego exportarlos.
+
+Cada **Factory** analiza desde el archivo de configuración la persistencia elegida `PERS` y al llamar a su método `get`, nos devuelve cada DAO correspondiente a dicha persistencia.
+
+Los DAOs implementan el patrón **singleton** para impedir crear más de una instancia de estos mecanismos de acceso a los datos.  
+Puede verse en el archivo índice que a propósito se instanció por segunda vez cada DAO y luego se muestra por consola la comparación de ambas instancias para cada uno de los casos, comprobándose que se trata de la misma instancia.
+
+Se implementó el patrón **Repository** para la persistencia de los productos y mensajes. Dentro de la carpeta `repositories` se encuentra el repositorio base junto a los particulares que extienden de éste.
+Para no hacer 2 versiones de la entrega, se implementó el patrón **Repository** por encima de la capa de DAO.
+
+Se refactorizó la lógica de validaciones de datos, usando métodos estáticos respectivos de cada entidad. Para facilitar y mejorar la lógica de dichas validaciones se implementó la librería **Joi**
