@@ -1,8 +1,6 @@
-import config from "../../../config.js";
-
 class MessagesFactoryDAO {
-  static async get() {
-    switch (config.PERS) {
+  static async get(PERS) {
+    switch (PERS) {
       case "file": {
         const { default: MessagesDAOFS } = await import("./MessagesDAOFS.js");
         return new MessagesDAOFS();

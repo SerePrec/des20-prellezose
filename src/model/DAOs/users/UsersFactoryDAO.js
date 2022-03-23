@@ -1,8 +1,6 @@
-import config from "../../../config.js";
-
 class UsersFactoryDAO {
-  static async get() {
-    switch (config.PERS) {
+  static async get(PERS) {
+    switch (PERS) {
       case "file": {
         const { default: UsersDAOFS } = await import("./UsersDAOFS.js");
         return new UsersDAOFS();

@@ -4,9 +4,11 @@ import UsersFactoryDAO from "./DAOs/users/UsersFactoryDAO.js";
 import config from "../config.js";
 import { logger } from "../logger/index.js";
 
-const productsDAO = await ProductsFactoryDAO.get();
-const messagesDAO = await MessagesFactoryDAO.get();
-const userDAO = await UsersFactoryDAO.get();
+const PERS = config.PERS;
+
+const productsDAO = await ProductsFactoryDAO.get(PERS);
+const messagesDAO = await MessagesFactoryDAO.get(PERS);
+const userDAO = await UsersFactoryDAO.get(PERS);
 
 //Inicializo los DAOS
 try {
@@ -26,9 +28,9 @@ export { productsDAO, messagesDAO, userDAO };
 // ****************************************
 // instancio otra vez para verificar
 // que devuelven la misma instancia
-const productsDAO2 = await ProductsFactoryDAO.get();
-const messagesDAO2 = await MessagesFactoryDAO.get();
-const userDAO2 = await UsersFactoryDAO.get();
+const productsDAO2 = await ProductsFactoryDAO.get(PERS);
+const messagesDAO2 = await MessagesFactoryDAO.get(PERS);
+const userDAO2 = await UsersFactoryDAO.get(PERS);
 
 console.log("\n******************* TEST SINGLETON *******************");
 console.log(

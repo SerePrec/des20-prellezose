@@ -10,8 +10,8 @@ export const getAllProducts = async () => {
   return products;
 };
 
-export const createProduct = async newProduct => {
-  const newProductEntitie = new Product(newProduct);
+export const createProduct = async newProductData => {
+  const newProductEntitie = new Product(newProductData);
   const createdProductEntitie = await productsModel.save(newProductEntitie);
   return new ProductDTO(createdProductEntitie);
 };

@@ -10,14 +10,10 @@ const validateId = (req, res, next) => {
 };
 
 const validatePostProductBody = (req, res, next) => {
-  let { title, price, thumbnail } = req.body;
-  const validated = validateDataService.validatePostProductBody(
-    title,
-    price,
-    thumbnail
-  );
+  const data = req.body;
+  const validated = validateDataService.validatePostProductBody(data);
   if (validated && !validated.error) {
-    req.body = { ...req.body, ...validated };
+    req.body = { ...validated };
     next();
   } else {
     res.status(400).json({ error: validated.error });
@@ -25,14 +21,10 @@ const validatePostProductBody = (req, res, next) => {
 };
 
 const validatePutProductBody = (req, res, next) => {
-  let { title, price, thumbnail } = req.body;
-  const validated = validateDataService.validatePutProductBody(
-    title,
-    price,
-    thumbnail
-  );
+  const data = req.body;
+  const validated = validateDataService.validatePutProductBody(data);
   if (validated && !validated.error) {
-    req.body = { ...req.body, ...validated };
+    req.body = { ...validated };
     next();
   } else {
     res.status(400).json({ error: validated.error });

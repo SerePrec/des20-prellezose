@@ -13,8 +13,6 @@ export const getAllMessages = async () => {
 };
 
 export const createMessage = async message => {
-  const validMessage = Message.validate(message, true);
-  if (!validMessage) throw new Error("Mensaje inválido");
   message.text = escapeHtml(message.text);
   const newMessageEntitie = new Message(message);
   const createdMessageEntitie = await messagesModel.save(newMessageEntitie);

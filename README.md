@@ -105,7 +105,7 @@ Dentro de esta carpeta y agrupado en subcarpetas, se encuentran:
 - `schemas`: schemas de **mongoose**
 - `index.js`: archivo de índice que exporta los DAOs. Desde este archivo se importan las distintas **Factories** y se les pide el DAO correspondiente para luego exportarlos.
 
-Cada **Factory** analiza desde el archivo de configuración la persistencia elegida `PERS` y al llamar a su método `get`, nos devuelve cada DAO correspondiente a dicha persistencia.
+Cada **Factory** toma como parámetro la persistencia elegida `PERS` y al llamar a su método `get`, nos devuelve el DAO correspondiente a dicha persistencia.
 
 Los DAOs implementan el patrón **singleton** para impedir crear más de una instancia de estos mecanismos de acceso a los datos.  
 Puede verse en el archivo índice que a propósito se instanció por segunda vez cada DAO y luego se muestra por consola la comparación de ambas instancias para cada uno de los casos, comprobándose que se trata de la misma instancia.

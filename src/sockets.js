@@ -36,12 +36,7 @@ export default io => {
     //Escucha el evento de guardar un nuevo producto
     socket.on("saveProduct", async product => {
       try {
-        const { title, price, thumbnail } = product;
-        const newProduct = validateDataService.validatePostProductBody(
-          title,
-          price,
-          thumbnail
-        );
+        const newProduct = validateDataService.validatePostProductBody(product);
         if (newProduct && !newProduct.error) {
           await productsService.createProduct(newProduct);
           const list = await productsService.getAllProducts();
@@ -58,9 +53,14 @@ export default io => {
     //Escucha el evento de un nuevo mensaje enviado
     socket.on("newMessage", async message => {
       try {
-        await messagesService.createMessage(message);
-        const normalizedMessages = await messagesService.getAllMessages();
-        io.sockets.emit("allMessages", normalizedMessages);
+        const newMessage = validateDataService.validateMessage(message);
+        if (newMessage && !newMessage.error) {
+          await messagesService.createMessage(message);
+          const normalizedMessages = await messagesService.getAllMessages();
+          io.sockets.emit("allMessages", normalizedMessages);
+        } else {
+          socket.emit("messageErrors", "Los valores enviados no son válidos");
+        }
       } catch (error) {
         logger.error(error);
         socket.emit("messageErrors", "Error al procesar el mensaje enviado");

@@ -15,9 +15,8 @@ export const getAllProducts = async (req, res) => {
 
 export const createProduct = async (req, res) => {
   try {
-    let { title, price, thumbnail } = req.body;
-    let newProduct = { title, price, thumbnail };
-    newProduct = await productsService.createProduct(newProduct);
+    const data = req.body;
+    const newProduct = await productsService.createProduct(data);
     logger.info("Producto creado con éxito");
     res.json({ result: "ok", newProduct });
   } catch (error) {
@@ -44,10 +43,9 @@ export const getProduct = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
   try {
-    const { title, price, thumbnail } = req.body;
+    const data = req.body;
     const { id } = req.params;
-    let updateProduct = { title, price, thumbnail };
-    updateProduct = await productsService.updateProduct(id, updateProduct);
+    const updateProduct = await productsService.updateProduct(id, data);
     if (updateProduct !== null) {
       logger.info("Producto actualizado con éxito");
       res.json({ result: "ok", updateProduct });
