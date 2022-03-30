@@ -20,10 +20,6 @@ Comprobar que si llamo a la factory dos veces, con una misma opción elegida, de
 
 Implementar el patrón Repository para la persistencia de productos y mensajes.
 
-### Deploy en Heroku (Temporal):
-
-https://des19-prellezose.herokuapp.com/
-
 ### Ejecución
 
 Luego de clonar o descargar el repositorio e instalar todas las dependencias con `npm install`, existen dos comandos para levantar el proyecto.
